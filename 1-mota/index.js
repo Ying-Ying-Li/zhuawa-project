@@ -36,7 +36,23 @@
 	// 我是袁鑫老师
 	function drawHero(context, heroImg, allSpriteImg) {
 
-		var draw = function () {
+		function Hero(imgPos, rect){
+			this.img = heroImg;
+			this.context = context;
+			this.imgPos = {
+				x: imgPos.x,
+				y: imgPos.y,
+				width: 32,
+				height: 32
+			};
+			this.rect = {
+				x: rect.x,
+				y: rect.y,
+				width: 40,
+				height: 40
+			};
+		}
+		Hero.prototype.draw = function () {
 			this.context
 				.drawImage(
 					this.img,
@@ -51,79 +67,71 @@
 				);
 		}
 
-		var hero = {
-			img: heroImg,
-			context: context,
-			imgPos: {
-				x: 0,
-				y: 0,
-				width: 32,
-				height: 32
-			},
+		function Monster(imgPos,rect){
+			Hero.call(this,imgPos,rect)
+			this.img = allSpriteImg;
+		}
+		Monster.prototype = Object.create(Hero.prototype);
 
-			rect: {
-				x: 0,
-				y: 0,
-				width: 40,
-				height: 40
-			},
-
-			draw: draw
-		};
-
-		var monster = {
-			img: allSpriteImg,
-			context: context,
-			imgPos: {
-				x: 858,
-				y: 529,
-				width: 32,
-				height: 32
-			},
-
-			rect: {
-				x: 120,
-				y: 120,
-				width: 40,
-				height: 40
-			},
-
-			draw: draw
-		};
-
+		var hero = new Hero({x: 0, y: 0}, {x: 0, y: 0});
 		hero.draw();
-		monster.draw();
+		var monsters = [new Monster({x: 858, y: 529}, {x: 120, y: 120}), new Monster({x: 858, y: 462}, {x: 80, y: 0})];
+		monsters.forEach(item => {
+			item.draw();
+		});
 
 		document.onkeydown = function(e){
 			var moveX = 0, moveY = 0;
+			var imgPosX, imgPosY;
 			switch(e.keyCode){
 				case 38:   //上
 					moveY = -hero.rect.height;
+					imgPosX = 0;
+					imgPosY = 96;
 					break;
 				case 40:   //下
 					moveY = hero.rect.height;
+					imgPosX = 0;
+					imgPosY = 0;
 					break;
 				case 37:   //左
 					moveX = -hero.rect.width;
+					imgPosX = 0;
+					imgPosY = 32;
 					break;
 				case 39:   //右
 					moveX = hero.rect.width;
+					imgPosX = 0;
+					imgPosY = 64;
 					break;
 				default:
 					return;
 			}
+			heroMove(moveX, moveY, imgPosX, imgPosY);
+		}
+		function heroMove(moveX, moveY, imgPosX, imgPosY){
 			var newX = hero.rect.x + moveX;
 			var newY = hero.rect.y + moveY;
-			if(newX==monster.rect.x && newY==monster.rect.y){
-				console.log('碰到野怪了');
-			}else if(newX<0 || newX>(500-hero.rect.width) || newY<0 || newY>(300-hero.rect.height)){
+			var meetMonster = false;
+			monsters.forEach(item => {
+				if(newX==item.rect.x && newY==item.rect.y){
+					meetMonster = true;
+					console.log('碰到野怪了');
+					return;
+				}
+			});
+			if(meetMonster) return;
+			if(newX<0 || newX>(500-hero.rect.width) || newY<0 || newY>(300-hero.rect.height)){
 				console.log('到达画布边缘了');
-			}else{
-				context.clearRect(hero.rect.x,hero.rect.y,hero.rect.width,hero.rect.height);
-				hero.rect.x = newX;
-				hero.rect.y = newY;
-				hero.draw();
+				return;
 			}
+
+			context.clearRect(hero.rect.x,hero.rect.y,hero.rect.width,hero.rect.height);
+			hero.rect.x = newX;
+			hero.rect.y = newY;
+			hero.imgPos.x = imgPosX;
+			hero.imgPos.y = imgPosY;
+			hero.draw();
 		}
 	}
 
