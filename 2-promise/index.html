@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>手写Promise</title>
+</head>
+<body>
+    <script src="./promise.js"></script>
+    <script>
+        var task = new Promise((resolve, reject) => {
+            //setTimeout(resolve(1), 500);
+            //throw Error(2);
+            setTimeout(function(){
+                reject(2)}, 3000);
+        })
+        .then(res => {
+            console.log('res1: ' + res);
+            return new Promise((resolve, reject) => {
+                resolve(2);
+            })
+        })
+        .then(res => {
+            console.log('res2: ' + res);
+            return 3;
+        })
+        .then(res => {
+            console.log('res3: ' + res);
+            return 5;
+        })
+        .catch(err => {
+            console.log('err: ' + err);
+        }) 
+    </script>
+</body>
+</html>
