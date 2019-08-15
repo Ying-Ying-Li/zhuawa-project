@@ -32,3 +32,13 @@ body {
 .item.multiple-image .image-list img {
     width: 33%;
 }
+
+.large-image img{
+    width: 100%;
+    display: block;
+}
+
+.large-image h3{
+    font-size: 17px;
+    color: #aaa;
+}

@@ -65,6 +65,16 @@
                     "https://p3.pstatp.com/list/pgc-image/9fef910a621349439a8ba9724f1ac74d"
                 ]
             }
+        },
+        {
+            "type": "largePic",
+            "data": {
+                "articleUrl": "https://m.toutiao.com/item/6724654264259461379/",
+                "title": "这款我看中的京东智能音箱，居然只要199元！几乎是全年低价了",
+                "imageList": [
+                    "http://sf6-ttcdn-tos.pstatp.com/img/web.business.image/201908135d0dac19bb32e8d2400c8210~640x0.image"
+                ]
+            }
         }
     ]
 }
