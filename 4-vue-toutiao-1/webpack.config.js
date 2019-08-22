@@ -87,8 +87,8 @@ module.exports = {
             app.get('/price', function (req, res) {
                 res.send(JSON.stringify({
                     infos: [
-                        {price: 23 * Math.random()},
-                        {price: 23 * Math.random()}
+                        {price: 23 * Math.random(),month: (new Date()).getMonth()},
+                        {price: 23 * Math.random(),month: (new Date()).getMonth()+1}
                     ]
                 }));
             });

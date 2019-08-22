@@ -3,9 +3,41 @@
  */
 import echarts from 'echarts'
 
+const createDebounce = (fn, delay = 1000) => {
+    
+    let timmer = null;
+
+    return args => {
+        clearTimeout(timmer);
+        timmer = setTimeout(() => {
+            fn && fn(args);
+        }, delay);
+    };
+};
+
 export const functionalTool = {
     install(Vue, options) {
+        Vue.mixin({
+            methods: {
+                createDebounce
+            }
+        })
+
         Vue.component('echarts',{
+            props: {
+                width: {
+                    type: Number,
+                    default: -1
+                },
+                height: {
+                    type: Number,
+                    default: -1
+                },
+                options: {
+                    type: Object,
+                    default: {}
+                }
+            },
             render(createElement) {
                 return createElement(
                     'div',
@@ -13,44 +45,49 @@ export const functionalTool = {
                         attrs: {
                             id: this.randomId
                         },
-                        style: {
-                            width: '100%',
-                            height: '100px'
-                        }
+                        style: this.canvasStyle,
+                        directives: [
+                            {
+                                name: 'echarts'
+                            }
+                        ]
                     }
                 )
             },
             mounted() {
-                var myChart = echarts.init(this.$el);
-
-                // 指定图表的配置项和数据
-                var option = {
-                    title: {
-                        text: 'ECharts 入门示例'
-                    },
-                    tooltip: {},
-                    legend: {
-                        data:['销量']
-                    },
-                    xAxis: {
-                        data: ["衬衫","羊毛衫","雪纺衫","裤子","高跟鞋","袜子"]
-                    },
-                    yAxis: {},
-                    series: [{
-                        name: '销量',
-                        type: 'bar',
-                        data: [5, 20, 36, 10, 10, 20]
-                    }]
-                };
-
-                // 使用刚指定的配置项和数据显示图表。
-                myChart.setOption(option);
+                
+                this.draw();
+                this.$watch('options', options => {
+                    this.draw();
+                });
             },
             computed: {
                 randomId() {
                     return 'echarts-' + Math.floor(Math.random()*10);
+                },
+                canvasStyle() {
+                    return {
+                        width: this.width==-1 ? '100%' : this.width+'px',
+                        height: this.height==-1 ? '100%' : this.height+'px'
+                    }
+                }
+            },
+            methods: {
+                recieveEchartsContext(context) {
+                    this.echartsContext = context;
+                },
+                draw() {
+                    const options = this.options;
+                    this.echartsContext.setOption(options);
                 }
             }
         })
+
+        Vue.directive('echarts', {
+            inserted: (el, binding, vnode) => {
+                const charts = echarts.init(el);
+                vnode.context.recieveEchartsContext && vnode.context.recieveEchartsContext(charts);
+            }
+        });
     }
 }

@@ -2,12 +2,12 @@
     <div class="item agriculture">
         <h3>猪肉价格查询器</h3>
         <label for="area">地名/区号</label>
-        <input v-model="area" type="text" value="" id="area"/>
+        <input v-model="area" type="text" id="area"/>
         <div class="price-area">
             <h4>{{area}}猪肉价格:</h4>
             <span>(测算时间：{{date()}})</span>
-            <echarts v-bind:options="chartsOptions"></echarts>
-        </div>
+            <echarts :options="chartsOptions"></echarts>
+        </div>                             
     </div>
 </template>
 <script>
@@ -15,8 +15,38 @@ export default {
     name: 'Agriculture',
     data() {
         return {
-            area: '',
-            chartsOptions: []
+            area: '上海',
+            infos: [],
+        }
+    },
+    created() {
+        const debounce = this.createDebounce(area => {
+            this.requestPrice(area);
+        }, 3000);
+        this.requestPrice(this.area);
+        this.$watch('area', area => debounce(area));
+    },
+    computed: {
+        // 指定图表的配置项和数据
+        chartsOptions() {
+            return {
+                    title: {
+                        text: '猪肉价格'
+                    },
+                    tooltip: {},
+                    legend: {
+                        data:['价格']
+                    },
+                    xAxis: {
+                        data: this.infos.map(item => item.month+'月')
+                    },
+                    yAxis: {},
+                    series: [{
+                        name: '价格',
+                        type: 'bar',
+                        data: this.infos.map(item => item.price)
+                    }]
+                }
         }
     },
     methods: {
@@ -26,6 +56,14 @@ export default {
         },
         PrefixZero(num, n=2) {
             return (Array(n).join(0) + num).slice(-n);
+        },
+
+        requestPrice(area) {
+            fetch(`/price?area=${area}`)
+                .then(res => res.json())
+                .then(res => {
+                    this.infos = res.infos;
+                });
         }
     }
 }
