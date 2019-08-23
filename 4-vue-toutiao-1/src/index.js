@@ -3,8 +3,9 @@
  */
 import Vue from 'vue'
 import Main from '@/pages/main'
-import {functionalTool} from '@/utils'
+import {reachBottomNotify, functionalTool} from '@/utils'
 
+Vue.use(reachBottomNotify);
 Vue.use(functionalTool);
 
 const vm = new Vue({
